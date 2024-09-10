@@ -65,7 +65,7 @@ fn get_firewall_impl(driver_name: Option<String>) -> NetavarkResult<FirewallImpl
                     }
                 };
                 return Ok(FirewallImpl::Firewalld(conn));
-            },
+            }
             #[cfg(not(target_os = "freebsd"))]
             IPTABLES => return Ok(FirewallImpl::Iptables),
             #[cfg(not(target_os = "freebsd"))]

@@ -78,10 +78,12 @@ pub enum NetavarkError {
 
     Netlink(netlink_packet_core::error::ErrorMessage),
 
+    #[cfg(not(target_os = "freebsd"))]
     DHCPProxy(tonic::Status),
 
     List(NetavarkErrorList),
 
+    #[cfg(not(target_os = "freebsd"))]
     Nftables(nftables::helper::NftablesError),
 
     SubnetParse(ipnet::AddrParseError),
@@ -153,6 +155,7 @@ impl fmt::Display for NetavarkError {
             NetavarkError::Sysctl(e) => write!(f, "Sysctl error: {e}"),
             NetavarkError::Serde(e) => write!(f, "JSON Decoding error: {e}"),
             NetavarkError::Netlink(e) => write!(f, "Netlink error: {e}"),
+            #[cfg(not(target_os = "freebsd"))]
             NetavarkError::DHCPProxy(e) => write!(f, "dhcp proxy error: {e}"),
             NetavarkError::List(list) => {
                 if list.0.len() == 1 {
@@ -165,6 +168,7 @@ impl fmt::Display for NetavarkError {
                     Ok(())
                 }
             }
+            #[cfg(not(target_os = "freebsd"))]
             NetavarkError::Nftables(e) => write!(f, "nftables error: {e}"),
             NetavarkError::SubnetParse(e) => write!(f, "parsing IP subnet error: {e}"),
             NetavarkError::AddrParse(e) => write!(f, "parsing IP address error: {e}"),
@@ -216,12 +220,14 @@ impl From<netlink_packet_core::error::ErrorMessage> for NetavarkError {
     }
 }
 
+#[cfg(not(target_os = "freebsd"))]
 impl From<tonic::Status> for NetavarkError {
     fn from(err: tonic::Status) -> Self {
         NetavarkError::DHCPProxy(err)
     }
 }
 
+#[cfg(not(target_os = "freebsd"))]
 impl From<nftables::helper::NftablesError> for NetavarkError {
     fn from(err: nftables::helper::NftablesError) -> Self {
         NetavarkError::Nftables(err)
