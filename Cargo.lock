@@ -1245,7 +1245,7 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 [[package]]
 name = "libc"
 version = "0.2.155"
-source = "git+https://github.com/Project-Vacuum/libc.git?rev=cc2a58cc37136701343bbd6c688428139ae3c7ee#cc2a58cc37136701343bbd6c688428139ae3c7ee"
+source = "git+https://github.com/Project-Vacuum/libc.git?rev=98f7a44844859653295f38129c5f3f33f0a7e4fc#98f7a44844859653295f38129c5f3f33f0a7e4fc"
 
 [[package]]
 name = "linux-raw-sys"

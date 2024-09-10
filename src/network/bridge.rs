@@ -11,11 +11,21 @@ use crate::{
     error::{ErrorWrap, NetavarkError, NetavarkErrorList, NetavarkResult},
     exec_netns,
     firewall::{
-        iptables::MAX_HASH_SIZE,
         state::{remove_fw_config, write_fw_config},
     },
     network::{constants, core_utils::disable_ipv6_autoconf, types},
 };
+
+#[cfg(not(target_os = "freebsd"))]
+use crate::{
+    firewall::{
+        iptables::MAX_HASH_SIZE,
+    },
+};
+
+#[cfg(target_os = "freebsd")]
+/// For now till we have 1st class FreeBSD native firewall(s) support
+const MAX_HASH_SIZE: usize = 13;
 
 use super::{
     constants::{
