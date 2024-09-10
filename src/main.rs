@@ -69,7 +69,8 @@ fn main() {
     let aardvark_bin = opts
         .aardvark_binary
         .unwrap_or_else(|| OsString::from("/usr/libexec/podman/aardvark-dns"));
-    let result = match opts.subcmd {
+    let _subcmd = opts.subcmd;
+    let result = match _subcmd {
         SubCommand::Setup(setup) => setup.exec(
             opts.file,
             config,
@@ -91,7 +92,9 @@ fn main() {
         #[cfg(not(target_os = "freebsd"))]
         SubCommand::DHCPProxy(proxy) => dhcp_proxy::serve(proxy),
         #[cfg(target_os = "freebsd")]
-        SubCommand::DHCPProxy => Err(NetavarkError::Message("Command not supported")),
+        SubCommand::DHCPProxy => Err(NetavarkError::Message(format!(
+            "Command not supported - \"{_subcmd}\""
+        ))),
         SubCommand::FirewallDReload => firewalld_reload::listen(config),
     };
 

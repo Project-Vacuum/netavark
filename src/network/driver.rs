@@ -54,14 +54,14 @@ pub fn get_network_driver<'a>(
     info: DriverInfo<'a>,
     plugins_directories: &Option<Vec<OsString>>,
 ) -> NetavarkResult<Box<dyn NetworkDriver + 'a>> {
-    match info.network.driver.as_str() {
+    let _network_driver = info.network.driver.as_str();
+    match _network_driver {
         constants::DRIVER_BRIDGE => Ok(Box::new(Bridge::new(info))),
         #[cfg(not(target_os = "freebsd"))]
         constants::DRIVER_IPVLAN | constants::DRIVER_MACVLAN => Ok(Box::new(Vlan::new(info))),
         #[cfg(target_os = "freebsd")]
         constants::DRIVER_IPVLAN | constants::DRIVER_MACVLAN => Err(NetavarkError::Message(format!(
-            "Driver not supported - \"{}\"",
-            info.network.driver
+            "Network driver not supported - \"{_network_driver}\""
         ))),
 
         name => {
@@ -77,8 +77,7 @@ pub fn get_network_driver<'a>(
             }
 
             Err(NetavarkError::Message(format!(
-                "unknown network driver \"{}\"",
-                info.network.driver
+                "unknown network driver \"{_network_driver}\""
             )))
         }
     }
