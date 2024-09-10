@@ -5,11 +5,15 @@ use crate::network::internal_types::{
 use log::{debug, info};
 use zbus::blocking::Connection;
 
+#[cfg(not(target_os = "freebsd"))]
 pub mod firewalld;
 pub mod fwnone;
+#[cfg(not(target_os = "freebsd"))]
 pub mod iptables;
+#[cfg(not(target_os = "freebsd"))]
 pub mod nft;
 pub mod state;
+#[cfg(not(target_os = "freebsd"))]
 mod varktables;
 
 const IPTABLES: &str = "iptables";
@@ -47,7 +51,9 @@ fn get_firewall_impl(driver_name: Option<String>) -> NetavarkResult<FirewallImpl
     // It respects "firewalld", "iptables", "nftables", "none".
     if let Some(driver) = driver_name {
         debug!("Forcibly using firewall driver {driver}");
-        match driver.to_lowercase().as_str() {
+        let _driver = driver.to_lowercase().as_str();
+        match _driver {
+            #[cfg(not(target_os = "freebsd"))]
             FIREWALLD => {
                 let conn = match Connection::system() {
                     Ok(c) => c,
@@ -59,9 +65,16 @@ fn get_firewall_impl(driver_name: Option<String>) -> NetavarkResult<FirewallImpl
                     }
                 };
                 return Ok(FirewallImpl::Firewalld(conn));
-            }
+            },
+            #[cfg(not(target_os = "freebsd"))]
             IPTABLES => return Ok(FirewallImpl::Iptables),
+            #[cfg(not(target_os = "freebsd"))]
             NFTABLES => return Ok(FirewallImpl::Nftables),
+            #[cfg(target_os = "freebsd")]
+            FIREWALLD | IPTABLES | NFTABLES =>
+                return Err(NetavarkError::Message(format!(
+                    "Firewall backend not supported - \"{_driver}\""
+                ))),
             NONE => return Ok(FirewallImpl::Fwnone),
             any => {
                 return Err(NetavarkError::Message(format!(
@@ -112,14 +125,17 @@ pub fn get_supported_firewall_driver(
 ) -> NetavarkResult<Box<dyn FirewallDriver>> {
     match get_firewall_impl(driver_name) {
         Ok(fw) => match fw {
+            #[cfg(not(target_os = "freebsd"))]
             FirewallImpl::Iptables => {
                 info!("Using iptables firewall driver");
                 iptables::new()
             }
+            #[cfg(not(target_os = "freebsd"))]
             FirewallImpl::Firewalld(conn) => {
                 info!("Using firewalld firewall driver");
                 firewalld::new(conn)
             }
+            #[cfg(not(target_os = "freebsd"))]
             FirewallImpl::Nftables => {
                 info!("Using nftables firewall driver");
                 nft::new()
