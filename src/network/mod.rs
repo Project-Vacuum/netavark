@@ -15,9 +15,11 @@ pub mod constants;
 pub mod core_utils;
 pub mod driver;
 pub mod internal_types;
+#[cfg(not(target_os = "freebsd"))]
 mod macvlan_dhcp;
 pub mod netlink;
 pub mod plugin;
+#[cfg(not(target_os = "freebsd"))]
 pub mod vlan;
 
 impl types::NetworkOptions {

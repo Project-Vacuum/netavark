@@ -11,8 +11,9 @@ use super::{
     constants, netlink,
     plugin::PluginDriver,
     types::{Network, PerNetworkOptions, PortMapping, StatusBlock},
-    vlan::Vlan,
 };
+#[cfg(not(target_os = "freebsd"))]
+use super::vlan::Vlan;
 use std::os::unix::fs::PermissionsExt;
 
 pub struct DriverInfo<'a> {
@@ -55,7 +56,13 @@ pub fn get_network_driver<'a>(
 ) -> NetavarkResult<Box<dyn NetworkDriver + 'a>> {
     match info.network.driver.as_str() {
         constants::DRIVER_BRIDGE => Ok(Box::new(Bridge::new(info))),
+        #[cfg(not(target_os = "freebsd"))]
         constants::DRIVER_IPVLAN | constants::DRIVER_MACVLAN => Ok(Box::new(Vlan::new(info))),
+        #[cfg(target_os = "freebsd")]
+        constants::DRIVER_IPVLAN | constants::DRIVER_MACVLAN => Err(NetavarkError::Message(format!(
+            "Driver not supported - \"{}\"",
+            info.network.driver
+        ))),
 
         name => {
             if let Some(dirs) = plugins_directories {

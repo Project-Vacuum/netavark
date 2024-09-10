@@ -2,6 +2,7 @@ use std::ffi::OsString;
 
 use crate::error::{NetavarkError, NetavarkResult};
 
+#[cfg(not(target_os = "freebsd"))]
 pub mod dhcp_proxy;
 pub mod firewalld_reload;
 pub mod setup;

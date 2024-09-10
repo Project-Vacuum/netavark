@@ -2,12 +2,14 @@ use std::ffi::OsString;
 
 use clap::{Parser, Subcommand};
 
+#[cfg(not(target_os = "freebsd"))]
 use netavark::commands::dhcp_proxy;
 use netavark::commands::firewalld_reload;
 use netavark::commands::setup;
 use netavark::commands::teardown;
 use netavark::commands::update;
 use netavark::commands::version;
+use netavark::error::NetavarkError;
 
 #[derive(Parser, Debug)]
 #[clap(version = env!("CARGO_PKG_VERSION"))]
@@ -46,8 +48,12 @@ enum SubCommand {
     Teardown(teardown::Teardown),
     /// Display info about netavark.
     Version(version::Version),
+    #[cfg(not(target_os = "freebsd"))]
     /// Start dhcp-proxy
     DHCPProxy(dhcp_proxy::Opts),
+    #[cfg(target_os = "freebsd")]
+    /// dhcp-proxy sub-command not supported
+    DHCPProxy,
     /// Listen for the firewalld reload event and reload fw rules
     #[command(name = "firewalld-reload")]
     FirewallDReload,
@@ -82,7 +88,10 @@ fn main() {
         ),
         SubCommand::Update(mut update) => update.exec(config, aardvark_bin, rootless),
         SubCommand::Version(version) => version.exec(),
+        #[cfg(not(target_os = "freebsd"))]
         SubCommand::DHCPProxy(proxy) => dhcp_proxy::serve(proxy),
+        #[cfg(target_os = "freebsd")]
+        SubCommand::DHCPProxy => Err(NetavarkError::Message("Command not supported")),
         SubCommand::FirewallDReload => firewalld_reload::listen(config),
     };
 

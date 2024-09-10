@@ -1245,7 +1245,7 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 [[package]]
 name = "libc"
 version = "0.2.155"
-source = "git+https://github.com/Project-Vacuum/libc.git?rev=376b54d10f65ff8ff76025d0803546261ce70519#376b54d10f65ff8ff76025d0803546261ce70519"
+source = "git+https://github.com/Project-Vacuum/libc.git?rev=cc2a58cc37136701343bbd6c688428139ae3c7ee#cc2a58cc37136701343bbd6c688428139ae3c7ee"
 
 [[package]]
 name = "linux-raw-sys"
@@ -1439,7 +1439,8 @@ dependencies = [
 [[package]]
 name = "netlink-packet-route"
 version = "0.19.0"
-source = "git+https://github.com/Project-Vacuum/netlink-packet-route.git?rev=b1b6a6efcfc3173ba77ef3372985bfc40baabd04#b1b6a6efcfc3173ba77ef3372985bfc40baabd04"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "74c171cd77b4ee8c7708da746ce392440cb7bcf618d122ec9ecc607b12938bf4"
 dependencies = [
  "anyhow",
  "byteorder",
